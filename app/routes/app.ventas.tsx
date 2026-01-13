@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 
-export default function SalesPage() {
+export default function VentasPage() {
 
 
 

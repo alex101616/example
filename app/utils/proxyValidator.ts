@@ -27,6 +27,17 @@ export function validateShop(request: Request) {
   return shop === `${process.env.SHOPIFY_ID}.myshopify.com`;
 }
 
+export function validateLoggedCustomer(request: Request) {
+  const customerId = new URL(request.url)
+    .searchParams.get("logged_in_customer_id");
+
+  if (!customerId) {
+    throw new Response("No logged customer", { status: 401 });
+  }
+
+  return true;
+}
+
 
 export function validateProxyRequest(request: Request) {
   if (!validateProxySignature(request)) {
@@ -36,4 +47,7 @@ export function validateProxyRequest(request: Request) {
   if (!validateShop(request)) {
     throw new Response("Invalid shop", { status: 401 });
   }
+
+  validateLoggedCustomer(request);
+
 }
