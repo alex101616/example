@@ -109,6 +109,10 @@ export const loader = async ({ request }: any) => {
           }
           edges {
             node {
+
+            displayFinancialStatus,
+            displayFulfillmentStatus,
+              paymentGatewayNames
               name
               createdAt
               totalPriceSet {
@@ -166,6 +170,10 @@ const historial = orders
       fecha: o.createdAt,
       total: o.totalPriceSet.shopMoney.amount,
       moneda: o.totalPriceSet.shopMoney.currencyCode,
+
+      displayFinancialStatus: o.displayFinancialStatus,
+      displayFulfillmentStatus: o.displayFulfillmentStatus,
+      paymentGatewayNames: o.paymentGatewayNames,
 
       customer: {
         id: extractId(o.customer.id),
