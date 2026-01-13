@@ -15,7 +15,7 @@ export async function graphqlWithRetry(
   let res = await graphqlFn(query, variables);
 
   if (res.status === 401 || res.status === 403) {
-    console.log("🔄 Token inválido, regenerando...");
+    console.log(" Token inválido, regenerando...");
 
     const newToken = await createToken();
     await setAdminToken(newToken);

@@ -55,7 +55,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   `;
 
   const variables = {
-    first: 50,
+    first: 250,
     sortKey: "CREATED_AT",
     reverse: true,
   };

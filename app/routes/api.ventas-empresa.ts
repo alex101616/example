@@ -5,7 +5,7 @@ import { validateProxyRequest } from "app/utils/proxyValidator";
 export const loader = async ({ request }: any) => {
 
 
-  //validateProxyRequest(request);
+  validateProxyRequest(request);
 
   const sapId = new URL(request.url).searchParams.get("id_customer_sap");
 
@@ -48,7 +48,7 @@ export const loader = async ({ request }: any) => {
       `
       query ($cursor: String) {
         customers(
-          first: 100,
+          first: 250,
           after: $cursor,
           query: "metafield:custom.id_customer_sap=${sapId}"
         ) {
@@ -98,7 +98,7 @@ export const loader = async ({ request }: any) => {
       `
       query ($cursor: String, $query: String!) {
         orders(
-          first: 100,
+          first: 250,
           after: $cursor,
           query: $query,
           reverse: true

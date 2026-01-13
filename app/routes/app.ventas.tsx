@@ -30,7 +30,7 @@ export default function SalesPage() {
       const total = parseFloat(node.totalPriceSet.shopMoney.amount);
 
       const sapField = node.customer?.metafields.edges.find(
-        (m) => m.node.key === "id_custumer_sap"
+        (m) => m.node.key === "id_customer_sap"
       );
 
        const sapNombreField = node.customer?.metafields.edges.find(
