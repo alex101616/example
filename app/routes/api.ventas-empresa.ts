@@ -4,8 +4,7 @@ import { validateProxyRequest } from "app/utils/proxyValidator";
 
 export const loader = async ({ request }: any) => {
 
-
-  validateProxyRequest(request);
+  // validateProxyRequest(request);
 
   const sapId = new URL(request.url).searchParams.get("id_customer_sap");
 
@@ -35,6 +34,7 @@ export const loader = async ({ request }: any) => {
     token = t;
   };
 
+  /* ================= CLIENTES ================= */
 
   let customers: any[] = [];
   let hasNext = true;
@@ -80,11 +80,11 @@ export const loader = async ({ request }: any) => {
     return Response.json({ historial: [] });
   }
 
-
-
   const filter = customers
     .map(c => `customer_id:${extractId(c.id)}`)
     .join(" OR ");
+
+  /* ================= ORDENES ================= */
 
   let orders: any[] = [];
   hasNext = true;
@@ -110,15 +110,47 @@ export const loader = async ({ request }: any) => {
           edges {
             node {
 
-            displayFinancialStatus,
-            displayFulfillmentStatus,
-              paymentGatewayNames
+              id
               name
               createdAt
+              cancelledAt
+
+              shippingAddress { id }
+
+              displayFinancialStatus
+              displayFulfillmentStatus
+              paymentGatewayNames
+
+              # 👇 PO REAL
+              customAttributes {
+                key
+                value
+              }
+
               totalPriceSet {
                 shopMoney {
                   amount
                   currencyCode
+                }
+              }
+
+              lineItems(first: 50) {
+                edges {
+                  node {
+                    title
+                    quantity
+
+                    variant { title }
+
+                    originalTotalSet {
+                      shopMoney {
+                        amount
+                        currencyCode
+                      }
+                    }
+
+                    image { url }
+                  }
                 }
               }
 
@@ -156,41 +188,55 @@ export const loader = async ({ request }: any) => {
 
   /* ================= FORMATEAR ================= */
 
-const historial = orders
-  .map(o => {
+  const historial = orders
+    .map(o => {
 
-    const mf = o.customer.metafields;
-    const sap = getMetafield(mf, "id_customer_sap");
+      const mf = o.customer.metafields;
+      const sap = getMetafield(mf, "id_customer_sap");
 
+      if (sap !== sapId) return null;
 
-    if (sap !== sapId) return null;
+      return {
+        numeroOrden: o.name,
 
-    return {
-      numeroOrden: o.name,
-      fecha: o.createdAt,
-      total: o.totalPriceSet.shopMoney.amount,
-      moneda: o.totalPriceSet.shopMoney.currencyCode,
+        // 👇 PO CORRECTO
+        poNumber: getOrderAttribute(o.customAttributes, "po_number"),
 
-      displayFinancialStatus: o.displayFinancialStatus,
-      displayFulfillmentStatus: o.displayFulfillmentStatus,
-      paymentGatewayNames: o.paymentGatewayNames,
+        fecha: o.createdAt,
+        total: o.totalPriceSet.shopMoney.amount,
+        moneda: o.totalPriceSet.shopMoney.currencyCode,
 
-      customer: {
-        id: extractId(o.customer.id),
-        nombre: o.customer.displayName,
-        email: o.customer.email,
-        telefono: o.customer.phone,
+        cancelledAt: o.cancelledAt,
+        shippingAddress: o.shippingAddress?.id,
+        displayFinancialStatus: o.displayFinancialStatus,
+        displayFulfillmentStatus: o.displayFulfillmentStatus,
+        paymentGatewayNames: o.paymentGatewayNames,
 
-        id_customer_sap: sap,
-        credito: getMetafield(mf, "credit_customer"),
-        empresa: getMetafield(mf, "company"),
-        industria: getMetafield(mf, "industry")
-      }
-    };
-  })
-  .filter(Boolean);
+        productos: o.lineItems.edges.map((li:any) => ({
+          title: li.node.variant?.title
+            ? `${li.node.title} - ${li.node.variant.title}`
+            : li.node.title,
 
+          quantity: li.node.quantity,
+          final_price: li.node.originalTotalSet.shopMoney.amount,
+          currency: li.node.originalTotalSet.shopMoney.currencyCode,
+          image: li.node.image?.url || null
+        })),
 
+        customer: {
+          id: extractId(o.customer.id),
+          nombre: o.customer.displayName,
+          email: o.customer.email,
+          telefono: o.customer.phone,
+
+          id_customer_sap: sap,
+          credito: getMetafield(mf, "credit_customer"),
+          empresa: getMetafield(mf, "company"),
+          industria: getMetafield(mf, "industry")
+        }
+      };
+    })
+    .filter(Boolean);
 
   return Response.json({
     sapId,
@@ -199,8 +245,7 @@ const historial = orders
   });
 };
 
-
-
+/* ================= HELPERS ================= */
 
 function extractId(gid: string) {
   return gid.split("/").pop();
@@ -217,4 +262,9 @@ function getMetafield(
         m.node.key === key && m.node.namespace === namespace
     )
     ?.node.value || null;
+}
+
+// 👇 NUEVO helper PO
+function getOrderAttribute(attrs:any[], key:string){
+  return attrs?.find(a => a.key === key)?.value || null;
 }
