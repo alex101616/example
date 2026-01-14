@@ -4,7 +4,7 @@ import { validateProxyRequest } from "app/utils/proxyValidator";
 
 export const loader = async ({ request }: any) => {
 
-  // validateProxyRequest(request);
+   validateProxyRequest(request);
 
   const sapId = new URL(request.url).searchParams.get("id_customer_sap");
 
