@@ -199,7 +199,7 @@ export const loader = async ({ request }: any) => {
       return {
         numeroOrden: o.name,
 
-        // 👇 PO CORRECTO
+        orderId: o.id.split("/").pop(),
         poNumber: getOrderAttribute(o.customAttributes, "po_number"),
 
         fecha: o.createdAt,
