@@ -4,7 +4,7 @@ import { validateProxyRequest } from "app/utils/proxyValidator";
 
 export const loader = async ({ request }: any) => {
 
-   validateProxyRequest(request); // activar en prod
+   validateProxyRequest(request);
 
   let orderId = new URL(request.url)
     .searchParams.get("order_id");
