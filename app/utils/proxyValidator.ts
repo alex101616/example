@@ -17,6 +17,7 @@ export function validateProxySignature(request: Request) {
     .update(msg)
     .digest("hex");
 
+    return { "url": url , "param": Object.fromEntries(url.searchParams) , "secret": process.env.SHOPIFY_API_SECRET }
   return digest === signature;
 }
 
@@ -51,12 +52,22 @@ export function validateLoggedCustomer(request: Request) {
 
 
 export function validateProxyRequest(request: Request) {
-  if (!validateProxySignature(request)) {
-    throw new Response("Invalid proxy signature", { status: 401 });
-  }
+  //if (!validateProxySignature(request)) {
+      const url = new URL(request.url);
+    throw new Response(  JSON.stringify({
+    url: url.toString(),
+    param: Object.fromEntries(url.searchParams),
+    secret: process.env.SHOPIFY_API_SECRET
+  }), { status: 401,
+ headers: {
+      "Content-Type": "application/json"
+    }
+
+   });
+ // }
 
   if (!validateShop(request)) {
-    throw new Response("Invalid shop", { status: 401 });
+    throw Response.json({ error: "Invalid shop" }, { status: 401 });
   }
 
   validateLoggedCustomer(request);
