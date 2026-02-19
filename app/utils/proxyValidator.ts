@@ -21,21 +21,14 @@ export function validateProxySignature(request: Request) {
 }
 
 
-//export function validateShop(request: Request) {
-//  const shop = new URL(request.url).searchParams.get("shop");
-
-//  return shop === `${process.env.SHOPIFY_ID}.myshopify.com`;
-//}
-
-
 export function validateShop(request: Request) {
   const shop = new URL(request.url).searchParams.get("shop");
 
-  return (
-    shop === `${process.env.SHOPIFY_ID}.myshopify.com` ||
-    shop === `${process.env.SHOPIFY_ID2}.myshopify.com`
-  );
+  return shop === `${process.env.SHOPIFY_ID}.myshopify.com`;
 }
+
+
+
 
 
 export function validateLoggedCustomer(request: Request) {
