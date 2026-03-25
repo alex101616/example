@@ -49,7 +49,7 @@ export default function EncuestasPage() {
 
     const updated = [...questions, current];
 
-    await fetch("/api/encuestas", {
+    await fetch("/api/mantenedor-encuestas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ questions: updated })
@@ -64,7 +64,7 @@ export default function EncuestasPage() {
 
     if (!confirm("¿Eliminar pregunta?")) return;
 
-    await fetch("/api/encuestas", {
+    await fetch("/api/mantenedor-encuestas", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id })

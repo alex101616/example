@@ -16,6 +16,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             id
             name
             createdAt
+            paymentGatewayNames
             totalPriceSet {
               shopMoney {
                 amount
