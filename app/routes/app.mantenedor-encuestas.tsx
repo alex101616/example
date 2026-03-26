@@ -105,6 +105,19 @@ export default function EncuestasPage() {
     setCurrent({ ...current, options: copy });
   }
 
+  async function downloadCSV() {
+  const res = await fetch("/api/export-encuestas");
+  const blob = await res.blob();
+
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "encuestas.csv";
+  a.click();
+}
+
+  
+
   /* ================= UTILS ================= */
 
   function labelType(type: string) {
@@ -114,11 +127,17 @@ export default function EncuestasPage() {
     return type;
   }
 
+  
+
   /* ================= UI ================= */
 
 
   return (
     <div style={{ padding: 20 }}>
+
+    <s-button variant="primary" onClick={downloadCSV}>
+      ⬇ Descargar respuestas
+    </s-button>
 
       <s-page heading="Mantenedor de Encuestas"></s-page>
 
